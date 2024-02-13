@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabla de Partidas</title>
+    <style>
+      .container {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #tablaPartidas {
+        width: 60%;
+      }
+
+      #seleccionPartida {
+        width: 30%;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <table id="tablaPartidas">
+        <thead>
+          <tr>
+            <th>ID Partida</th>
+            <th>Jugador 1</th>
+            <th>Jugador 2</th>
+            <th>Estado</th>
+            <th>Ganador</th>
+            <th>Último Turno</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>JugadorA</td>
+            <td>JugadorB</td>
+            <td>En curso</td>
+            <td>-</td>
+            <td>2024-02-13</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>JugadorC</td>
+            <td>JugadorD</td>
+            <td>Finalizada</td>
+            <td>JugadorD</td>
+            <td>2024-02-10</td>
+          </tr>
+          <!-- Puedes añadir más filas según sea necesario -->
+        </tbody>
+      </table>
+
+      <form id="seleccionPartida">
+        <fieldset>
+          <label for="partidaSelect">Seleccionar Partida:</label>
+          <legend aling="center">Hola</legend>
+          <select id="partidaSelect">
+            <option value="">Selecciona una partida</option>
+            <option value="1">Partida 1</option>
+            <option value="2">Partida 2</option>
+            <!-- Puedes agregar más opciones según sea necesario -->
+          </select>
+          <button type="button">Mostrar Partida</button>
+        </fieldset>
+      </form>
+    </div>
+  </body>
+</html>
