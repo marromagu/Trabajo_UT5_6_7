@@ -1,87 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tabla de Partidas</title>
-    <style>
-      .container {
-        display: flex;
-        justify-content: space-between;
-      }
 
-      #tablaPartidas {
-        width: 60%;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla de Partidas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
 
-      #seleccionPartida {
-        width: 30%;
-      }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
+    .tabla-partidas {
+      border-collapse: collapse;
+      width: 60%;
+      margin-right: 20px;
+    }
 
-      th,
-      td {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-      }
+    .tabla-partidas th,
+    .tabla-partidas td {
+      border: 1px solid #dddddd;
+      padding: 8px;
+      text-align: left;
+    }
 
-      th {
-        background-color: #f2f2f2;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <table id="tablaPartidas">
-        <thead>
-          <tr>
-            <th>ID Partida</th>
-            <th>Jugador 1</th>
-            <th>Jugador 2</th>
-            <th>Estado</th>
-            <th>Ganador</th>
-            <th>Último Turno</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>JugadorA</td>
-            <td>JugadorB</td>
-            <td>En curso</td>
-            <td>-</td>
-            <td>2024-02-13</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>JugadorC</td>
-            <td>JugadorD</td>
-            <td>Finalizada</td>
-            <td>JugadorD</td>
-            <td>2024-02-10</td>
-          </tr>
-          <!-- Puedes añadir más filas según sea necesario -->
-        </tbody>
-      </table>
+    .tabla-partidas th {
+      background-color: #f2f2f2;
+    }
 
-      <form id="seleccionPartida">
-        <fieldset>
-          <label for="partidaSelect">Seleccionar Partida:</label>
-          <legend aling="center">Hola</legend>
-          <select id="partidaSelect">
-            <option value="">Selecciona una partida</option>
-            <option value="1">Partida 1</option>
-            <option value="2">Partida 2</option>
-            <!-- Puedes agregar más opciones según sea necesario -->
-          </select>
-          <button type="button">Mostrar Partida</button>
-        </fieldset>
-      </form>
-    </div>
-  </body>
+    .formulario {
+      width: 30%;
+    }
+
+    .formulario select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .formulario button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .formulario button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <table class="tabla-partidas">
+      <thead>
+        <tr>
+          <th>ID Partida</th>
+          <th>Jugador 1</th>
+          <th>Jugador 2</th>
+          <th>Estado</th>
+          <th>Último Turno</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- INSERTAR_NUEVAS_FILAS -->
+      </tbody>
+    </table>
+
+    <form class="formulario" method="post" action="http://localhost:5000/Tablero">
+      <label for="partidaSelect">Seleccionar Partida:</label>
+      <select id="partidaSelect" name="partidaSelect">
+        <!-- OPTIONES_DE_PARTIDAS -->
+      </select>
+      <button type="submit">Ver Partida</button>
+    </form>
+  </div>
+
+</body>
+
 </html>
