@@ -85,6 +85,32 @@ public class ConexionConBDD implements Serializable {
         return mapaPartidasTerminadas;
     }
 
+    public String obtenerPartidas(int id) {
+        String representacionPartida = null;
+
+        try (Connection conexion = getConexion()) {
+            String sql = "SELECT jugador_1, jugador_2 FROM Partidas WHERE id_partida = ?";
+
+            try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+                statement.setInt(1, id);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    // Mover el cursor al primer registro
+                    if (resultSet.next()) {
+                        int jugador1ID = resultSet.getInt("jugador_1");
+                        int jugador2ID = resultSet.getInt("jugador_2");
+
+                        // Crear cadena representativa de la partida con nombres de jugadores
+                        representacionPartida = String.format("%d;%d", jugador1ID, jugador2ID);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error en ConexionConBDD: " + e.getMessage());
+        }
+
+        return representacionPartida;
+    }
+
     public ArrayList<String> obtenerDisparosDePartida(int idPartida) {
         ArrayList<String> listaDisparos = new ArrayList<>();
 
@@ -101,12 +127,12 @@ public class ConexionConBDD implements Serializable {
                         int jugadorId = resultSet.getInt("jugador_id");
                         int posicionX = resultSet.getInt("posicion_x");
                         int posicionY = resultSet.getInt("posicion_y");
-                        String mensajeResultado = resultSet.getString("resultado").equals("T") ? "Tocado" : "Agua";
-                        String jugador = obtenerNombreJugadorPorID(jugadorId);
+                        String mensajeResultado = resultSet.getString("resultado").equals("T") ? "T" : "A";
+                        //String jugador = obtenerNombreJugadorPorID(jugadorId);
 
                         // Crear cadena representativa del disparo
-                        String representacionDisparo = String.format("-> ID Disparo: %d, Jugador: %s, Coordenadas: %d X %d Y, Resultado: %s",
-                                idDisparo, jugador, posicionX, posicionY, mensajeResultado);
+                        String representacionDisparo = String.format("%d-%d-%d-%s",
+                                jugadorId, posicionX, posicionY, mensajeResultado);
 
                         // Agregar la representación al ArrayList
                         listaDisparos.add(representacionDisparo);
@@ -196,7 +222,7 @@ public class ConexionConBDD implements Serializable {
                         int posicionY = resultSet.getInt("posicion_y");
                         String orientacion = resultSet.getString("orientacion");
 
-                        String barcoString = "ID Barco: " + idBarco + ", Jugador ID: " + jugadorId + ", Tamaño: " + tamaño + ", Posición X: " + posicionX + ", Posición Y: " + posicionY + ", Orientación: " + orientacion;
+                        String barcoString =jugadorId + "-" + tamaño + "-" + posicionX + "-" + posicionY + "-" + orientacion;
                         barcosEnPartida.add(barcoString);
                     }
                 }

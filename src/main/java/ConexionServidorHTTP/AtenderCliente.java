@@ -63,13 +63,13 @@ public class AtenderCliente extends Thread {
                         atenderPorPost(contentLength);
                     }
                     default -> {
-                        contenidoHTML = Gestor.GestorDePaginas.getHTML(0, null, null);
+                        contenidoHTML = Gestor.GestorDePaginas.getHTML_Error();
                         enviarRespuestaHTML(contenidoHTML);
                         System.out.println("-> Ups, ha ocurrido algo inesperado: ");
                     }
                 }
             } else {
-                contenidoHTML = Gestor.GestorDePaginas.getHTML(0, null, null);
+                contenidoHTML = Gestor.GestorDePaginas.getHTML_Error();
                 enviarRespuestaHTML(contenidoHTML);
                 System.out.println("--> Ups.");
             }
@@ -89,7 +89,7 @@ public class AtenderCliente extends Thread {
                 crearHTML_TablaPartidas();
                 break;
             default:
-                contenidoHTML = Gestor.GestorDePaginas.getHTML(0, null, null);
+                contenidoHTML = Gestor.GestorDePaginas.getHTML_Error();
                 enviarRespuestaHTML(contenidoHTML);
                 break;
         }
@@ -131,7 +131,7 @@ public class AtenderCliente extends Thread {
             nuevasOpcionHTML.add(opcionHTML);
         }
 
-        contenidoHTML = Gestor.GestorDePaginas.getHTML(1, nuevasFilasHTML, nuevasOpcionHTML);
+        contenidoHTML = Gestor.GestorDePaginas.getHTML_Index(nuevasFilasHTML, nuevasOpcionHTML);
         enviarRespuestaHTML(contenidoHTML);
     }
 
@@ -178,7 +178,7 @@ public class AtenderCliente extends Thread {
             ArrayList<String> barcos = misDatos.consultarBarcosEnPartida(id);
             System.out.println(barcos);
 
-            String contenidoHTML = Gestor.GestorDePaginas.getHTML(2, null, null);
+            String contenidoHTML = Gestor.GestorDePaginas.getHTML_Tablero(id);
             enviarRespuestaHTML(contenidoHTML);
 
         } catch (IOException ex) {
