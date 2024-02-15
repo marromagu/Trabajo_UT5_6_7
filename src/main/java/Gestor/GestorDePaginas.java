@@ -18,6 +18,7 @@ import java.util.List;
 public class GestorDePaginas {
 
     private static GestorDePaginas miGestor = null;
+    private static final String[][] tablero = new String[20][20];
 
     public static GestorDePaginas getMiGestor() {
         return miGestor;
@@ -128,11 +129,24 @@ public class GestorDePaginas {
                 ArrayList<String> barcos = miCone.consultarBarcosEnPartida(id);
 
                 if (linea.contains("<!-- INSERTAR_Tablero1 -->")) {
-                    disparos(disparos, jugador2, contenidoHTML);
+                    tableroVacio();
                     pintarBarcos(barcos, jugador1, contenidoHTML);
+                    disparos(disparos, jugador2, contenidoHTML);
+
+                    for (int i = 0; i < 10; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            contenidoHTML.append(tablero[i][j]);
+                        }
+                    }
                 } else if (linea.contains("<!-- INSERTAR_Tablero2 -->")) {
-                    disparos(disparos, jugador1, contenidoHTML);
+                    tableroVacio();
                     pintarBarcos(barcos, jugador2, contenidoHTML);
+                    disparos(disparos, jugador1, contenidoHTML);
+                    for (int i = 0; i < 10; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            contenidoHTML.append(tablero[i][j]);
+                        }
+                    }
                 }
 
                 // Añadir la línea actual al contenido HTML
@@ -144,17 +158,17 @@ public class GestorDePaginas {
     }
 
     private static void tableroVacio() {
-        String[][] tablero = new String[10][10];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
                 tablero[i][j] = "<div class=\"casilla\"></div>";
             }
         }
     }
 
     private static void disparos(ArrayList<String> disparos, String jugador1, StringBuilder contenidoHTML) throws NumberFormatException {
-        for (int row = 1; row <= 10; row++) {
-            for (int col = 1; col <= 10; col++) {
+        for (int row = 1; row <= 20; row++) {
+            for (int col = 1; col <= 20; col++) {
                 boolean disparado = false;
                 for (String disparo : disparos) {
                     String[] partes = disparo.split("-");
@@ -166,25 +180,31 @@ public class GestorDePaginas {
                         disparado = true;
                         String mensajeResultado = partes[3];
                         if (mensajeResultado.equals("A")) {
-                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: blue;\">A " + posicionX + "-" + posicionY + "</div>").append("\n");
+                            tablero[row][col] = "<div class=\"casilla\" style=\"background-color: blue;\">A " + posicionX + "-" + posicionY + "</div>";
+                            System.out.println(tablero[row][col]);
+//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: blue;\">A " + posicionX + "-" + posicionY + "</div>").append("\n");
                         } else if (mensajeResultado.equals("T")) {
-                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: red;\">T " + posicionX + "-" + posicionY + "</div>").append("\n");
+                            tablero[row][col] = "<div class=\"casilla\" style=\"background-color: red;\">T " + posicionX + "-" + posicionY + "</div>";
+                            System.out.println(tablero[row][col]);
+//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: red;\">T " + posicionX + "-" + posicionY + "</div>").append("\n");
                         } else if (mensajeResultado.equals("H")) {
-                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: black;\">H " + posicionX + "-" + posicionY + "</div>").append("\n");
+                            tablero[row][col] = "<div class=\"casilla\" style=\"background-color: black;\">H " + posicionX + "-" + posicionY + "</div>";
+                            System.out.println(tablero[row][col]);
+//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: black;\">H " + posicionX + "-" + posicionY + "</div>").append("\n");
                         }
                         break;
                     }
                 }
-                if (!disparado) {
-                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
-                }
+//                if (!disparado) {
+//                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
+//                }
             }
         }
     }
 
     private static void pintarBarcos(ArrayList<String> barcos, String jugador2, StringBuilder contenidoHTML) throws NumberFormatException {
-        for (int row = 1; row <= 10; row++) {
-            for (int col = 1; col <= 10; col++) {
+        for (int row = 1; row <= 20; row++) {
+            for (int col = 1; col <= 20; col++) {
                 boolean casillaConBarco = false;
                 for (String barco : barcos) {
                     String[] partes = barco.split("-");
@@ -199,22 +219,26 @@ public class GestorDePaginas {
                         if (orientacion.equals("H")) {
                             if (posicionX == row && col >= posicionY && col < posicionY + tamaño) {
                                 casillaConBarco = true;
-                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
+                                tablero[row][col] = "<div class=\"casilla\" style=\"background-color: green;\">B " + posicionX + "-" + posicionY + "</div>";
+                                System.out.println(tablero[row][col]);
+//                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
                                 break;
                             }
                         } else if (orientacion.equals("V")) {
                             if (posicionY == col && row >= posicionX && row < posicionX + tamaño) {
                                 casillaConBarco = true;
-                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
+                                System.out.println(tablero[row][col]);
+                                tablero[row][col] = "<div class=\"casilla\" style=\"background-color: green;\">B " + posicionX + "-" + posicionY + "</div>";
+//                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
                                 break;
                             }
                         }
                     }
                 }
-                // Si la casilla no contiene un barco, se marca como vacía
-                if (!casillaConBarco) {
-                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
-                }
+//                // Si la casilla no contiene un barco, se marca como vacía
+//                if (!casillaConBarco) {
+//                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
+//                }
             }
         }
     }
