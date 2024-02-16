@@ -9,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,39 +20,75 @@ import java.util.List;
 public class GestorDePaginas {
 
     private static GestorDePaginas miGestor = null;
-    private static final String[][] tablero = new String[20][20];
+    private final String[][] tablero = new String[20][20];
+    private List<String> nuevasFilasHTML = null;
+    private List<String> nuevasOpcionHTML = null;
 
-    public static GestorDePaginas getMiGestor() {
-        return miGestor;
-
-    }
-
-    public static void setMiGestor(GestorDePaginas aMiGestor) {
-        miGestor = aMiGestor;
-    }
-
-    public static GestorDePaginas getCliente() {
+    public static GestorDePaginas getGestor() {
         if (miGestor == null) {
             miGestor = new GestorDePaginas();
         }
         return miGestor;
     }
 
-    public GestorDePaginas() {
+    private GestorDePaginas() {
     }
 
-    public static String getHTML_Index(List<String> nuevasFilasHTML, List<String> nuevasOpcionHTML) {
+    public String getHTML_Index() {
         StringBuilder contenidoHTML = new StringBuilder();
         // Obtener el directorio actual
         String directorioActual = System.getProperty("user.dir");
         // Ruta relativa del archivo GestorDePaginas.html
         String rutaArchivo;
         rutaArchivo = directorioActual + "\\src\\main\\java\\HTML\\index.html";
-        escribirIndex(rutaArchivo, nuevasFilasHTML, contenidoHTML, nuevasOpcionHTML);
+        crearHTML_TablaPartidas();
+        escribirIndex(rutaArchivo, contenidoHTML);
         return contenidoHTML.toString();
     }
 
-    public static String getHTML_Tablero(int id) {
+    public String getHTML_GET() {
+        StringBuilder contenidoHTML = new StringBuilder();
+        // Obtener el directorio actual
+        String directorioActual = System.getProperty("user.dir");
+        // Ruta relativa del archivo GestorDePaginas.html
+        String rutaArchivo;
+        rutaArchivo = directorioActual + "\\src\\main\\java\\HTML\\GET.html";
+        escribirIndex(rutaArchivo, contenidoHTML);
+        return contenidoHTML.toString();
+    }
+
+    private void crearHTML_TablaPartidas() {
+        Datos.ConexionConBDD misDatos = new ConexionConBDD();
+        HashMap<Integer, String> mapaPartidasTerminadas;
+
+        mapaPartidasTerminadas = misDatos.obtenerPartidasTerminadas();
+        nuevasFilasHTML = new ArrayList<>();
+        nuevasOpcionHTML = new ArrayList<>();
+        // Iterar sobre las partidas terminadas y generar las filas HTML correspondientes
+        for (Map.Entry<Integer, String> entrada : mapaPartidasTerminadas.entrySet()) {
+
+            int idPartida = entrada.getKey();
+            String[] detallesPartida = entrada.getValue().split(";");
+            String nombreJugador1 = detallesPartida[1];
+            String nombreJugador2 = detallesPartida[2];
+            String nombreGanador = detallesPartida[3];
+            String nombreUltimoTurno = detallesPartida[4];
+
+            // Crear la fila HTML con los detalles de la partida
+            String filaHTML = String.format("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
+                    idPartida, nombreJugador1, nombreJugador2, nombreGanador, nombreUltimoTurno);
+            // Crear la opción HTML para el formulario de selección
+            String opcionHTML = String.format("<option value=%d>Partida %d</option>",
+                    idPartida, idPartida);
+
+            // Agregar la fila HTML a la lista de nuevas filas
+            nuevasFilasHTML.add(filaHTML);
+            // Agregar la opción HTML a la lista de nuevas opciones
+            nuevasOpcionHTML.add(opcionHTML);
+        }
+    }
+
+    public String getHTML_Tablero(int id) {
         StringBuilder contenidoHTML = new StringBuilder();
         String directorioActual = System.getProperty("user.dir");
         String rutaArchivo;
@@ -59,7 +97,7 @@ public class GestorDePaginas {
         return contenidoHTML.toString();
     }
 
-    public static String getHTML_Error() {
+    public String getHTML_Error() {
         StringBuilder contenidoHTML = new StringBuilder();
         String directorioActual = System.getProperty("user.dir");
         String rutaArchivo;
@@ -75,19 +113,19 @@ public class GestorDePaginas {
         return contenidoHTML.toString();
     }
 
-    private static void escribirIndex(String rutaArchivo, List<String> nuevasFilasHTML, StringBuilder contenidoHTML, List<String> nuevasOpcionHTML) {
+    private void escribirIndex(String rutaArchivo, StringBuilder contenidoHTML) {
         try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
-            boolean insertarFilas = false;
             while ((linea = reader.readLine()) != null) {
-                AutoCompletar(linea, insertarFilas, nuevasFilasHTML, contenidoHTML, nuevasOpcionHTML);
+                AutoCompletar(linea, contenidoHTML);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void AutoCompletar(String linea, boolean insertarFilas, List<String> nuevasFilasHTML, StringBuilder contenidoHTML, List<String> nuevasOpcionHTML) {
+    private void AutoCompletar(String linea, StringBuilder contenidoHTML) {
+        boolean insertarFilas = false;
         // Activar el marcador de inserción cuando encuentres el marcador correspondiente
         if (linea.contains("<!-- INSERTAR_NUEVAS_FILAS -->")) {
             insertarFilas = true;
@@ -114,7 +152,7 @@ public class GestorDePaginas {
         contenidoHTML.append(linea).append("\n");
     }
 
-    private static void escribirTablero(String rutaArchivo, StringBuilder contenidoHTML, int id) {
+    private void escribirTablero(String rutaArchivo, StringBuilder contenidoHTML, int id) {
         try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
             Datos.ConexionConBDD miCone = new ConexionConBDD();
@@ -130,8 +168,8 @@ public class GestorDePaginas {
 
                 if (linea.contains("<!-- INSERTAR_Tablero1 -->")) {
                     tableroVacio();
-                    pintarBarcos(barcos, jugador1, contenidoHTML);
-                    disparos(disparos, jugador2, contenidoHTML);
+                    pintarBarcos(barcos, jugador1);
+                    disparos(disparos, jugador2);
 
                     for (int i = 0; i < 10; i++) {
                         for (int j = 0; j < 10; j++) {
@@ -140,8 +178,8 @@ public class GestorDePaginas {
                     }
                 } else if (linea.contains("<!-- INSERTAR_Tablero2 -->")) {
                     tableroVacio();
-                    pintarBarcos(barcos, jugador2, contenidoHTML);
-                    disparos(disparos, jugador1, contenidoHTML);
+                    pintarBarcos(barcos, jugador2);
+                    disparos(disparos, jugador1);
                     for (int i = 0; i < 10; i++) {
                         for (int j = 0; j < 10; j++) {
                             contenidoHTML.append(tablero[i][j]);
@@ -157,8 +195,7 @@ public class GestorDePaginas {
         }
     }
 
-    private static void tableroVacio() {
-
+    private void tableroVacio() {
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
                 tablero[i][j] = "<div class=\"casilla\"></div>";
@@ -166,10 +203,9 @@ public class GestorDePaginas {
         }
     }
 
-    private static void disparos(ArrayList<String> disparos, String jugador1, StringBuilder contenidoHTML) throws NumberFormatException {
+    private void disparos(ArrayList<String> disparos, String jugador1) throws NumberFormatException {
         for (int row = 1; row <= 20; row++) {
             for (int col = 1; col <= 20; col++) {
-                boolean disparado = false;
                 for (String disparo : disparos) {
                     String[] partes = disparo.split("-");
                     String jugadorId = partes[0];
@@ -177,35 +213,25 @@ public class GestorDePaginas {
                     int posicionY = Integer.parseInt(partes[2]);
 
                     if (jugador1.equals(jugadorId) && posicionX == row && posicionY == col) {
-                        disparado = true;
                         String mensajeResultado = partes[3];
                         if (mensajeResultado.equals("A")) {
                             tablero[row][col] = "<div class=\"casilla\" style=\"background-color: blue;\">A " + posicionX + "-" + posicionY + "</div>";
-                            System.out.println(tablero[row][col]);
-//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: blue;\">A " + posicionX + "-" + posicionY + "</div>").append("\n");
                         } else if (mensajeResultado.equals("T")) {
                             tablero[row][col] = "<div class=\"casilla\" style=\"background-color: red;\">T " + posicionX + "-" + posicionY + "</div>";
-                            System.out.println(tablero[row][col]);
-//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: red;\">T " + posicionX + "-" + posicionY + "</div>").append("\n");
                         } else if (mensajeResultado.equals("H")) {
                             tablero[row][col] = "<div class=\"casilla\" style=\"background-color: black;\">H " + posicionX + "-" + posicionY + "</div>";
-                            System.out.println(tablero[row][col]);
-//                            contenidoHTML.append("<div class=\"casilla\" style=\"background-color: black;\">H " + posicionX + "-" + posicionY + "</div>").append("\n");
                         }
                         break;
                     }
                 }
-//                if (!disparado) {
-//                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
-//                }
             }
         }
     }
 
-    private static void pintarBarcos(ArrayList<String> barcos, String jugador2, StringBuilder contenidoHTML) throws NumberFormatException {
+    private void pintarBarcos(ArrayList<String> barcos, String jugador2) throws NumberFormatException {
         for (int row = 1; row <= 20; row++) {
             for (int col = 1; col <= 20; col++) {
-                boolean casillaConBarco = false;
+
                 for (String barco : barcos) {
                     String[] partes = barco.split("-");
                     String jugadorId = partes[0];
@@ -215,45 +241,35 @@ public class GestorDePaginas {
                     String orientacion = partes[4];
 
                     if (jugador2.equals(jugadorId)) {
-                        // Verificar si la casilla actual está ocupada por el barco
                         if (orientacion.equals("H")) {
                             if (posicionX == row && col >= posicionY && col < posicionY + tamaño) {
-                                casillaConBarco = true;
                                 tablero[row][col] = "<div class=\"casilla\" style=\"background-color: green;\">B " + posicionX + "-" + posicionY + "</div>";
-                                System.out.println(tablero[row][col]);
-//                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
                                 break;
                             }
                         } else if (orientacion.equals("V")) {
                             if (posicionY == col && row >= posicionX && row < posicionX + tamaño) {
-                                casillaConBarco = true;
-                                System.out.println(tablero[row][col]);
                                 tablero[row][col] = "<div class=\"casilla\" style=\"background-color: green;\">B " + posicionX + "-" + posicionY + "</div>";
-//                                contenidoHTML.append("<div class=\"casilla\" style=\"background-color: green;\">B</div>").append("\n");
                                 break;
                             }
                         }
                     }
                 }
-//                // Si la casilla no contiene un barco, se marca como vacía
-//                if (!casillaConBarco) {
-//                    contenidoHTML.append("<div class=\"casilla\"></div>").append("\n");
-//                }
             }
         }
     }
 
-    private static void setTitulos(String linea, StringBuilder contenidoHTML, int id, ConexionConBDD miCone, String[] jugadores) {
-        if (linea.contains("<!-- H1 -->")) {
-            contenidoHTML.append("<h1>Tablas " + id + "</h1>").append("\n");
-        }
-        miCone.obtenerDisparosDePartida(id);
+    private void setTitulos(String linea, StringBuilder contenidoHTML, int id, ConexionConBDD miCone, String[] jugadores) {
 
+        if (linea.contains("<!-- H1 -->")) {
+            contenidoHTML.append("<h1>Tablas " + id + " Ganador: " + miCone.obtenerGanadorDePartida(id) + "</h1>").append("\n");
+        }
+        int j1 = Integer.parseInt(jugadores[0]);
+        int j2 = Integer.parseInt(jugadores[1]);
         if (linea.contains("<!-- H2 -->")) {
-            contenidoHTML.append("<h2>Jugador " + jugadores[0] + "</h2>").append("\n");
+            contenidoHTML.append("<h2>Jugador " + miCone.obtenerNombreJugadorPorID(j1) + "</h2>").append("\n");
         }
         if (linea.contains("<!-- H2.2 -->")) {
-            contenidoHTML.append("<h2>Jugador " + jugadores[1] + "</h2>").append("\n");
+            contenidoHTML.append("<h2>Jugador " + miCone.obtenerNombreJugadorPorID(j2) + "</h2>").append("\n");
         }
     }
 

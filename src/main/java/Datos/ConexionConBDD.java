@@ -222,7 +222,7 @@ public class ConexionConBDD implements Serializable {
                         int posicionY = resultSet.getInt("posicion_y");
                         String orientacion = resultSet.getString("orientacion");
 
-                        String barcoString =jugadorId + "-" + tamaño + "-" + posicionX + "-" + posicionY + "-" + orientacion;
+                        String barcoString = jugadorId + "-" + tamaño + "-" + posicionX + "-" + posicionY + "-" + orientacion;
                         barcosEnPartida.add(barcoString);
                     }
                 }
@@ -233,4 +233,29 @@ public class ConexionConBDD implements Serializable {
 
         return barcosEnPartida;
     }
+
+    public String obtenerGanadorDePartida(int idPartida) {
+        String nombreGanador = null;
+
+        try (Connection conexion = getConexion()) {
+            String sql = "SELECT j.nombre AS nombre_ganador "
+                    + "FROM Partidas p "
+                    + "JOIN Jugadores j ON p.ganador = j.id_jugador "
+                    + "WHERE p.id_partida = ?";
+
+            try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+                statement.setInt(1, idPartida);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        nombreGanador = resultSet.getString("nombre_ganador");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error en ConexionConBDD: al obtener el ganador de la partida: " + e.getMessage());
+        }
+
+        return nombreGanador;
+    }
+
 }
