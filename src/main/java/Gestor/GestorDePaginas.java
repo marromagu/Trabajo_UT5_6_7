@@ -53,6 +53,7 @@ public class GestorDePaginas {
         // Ruta relativa del archivo GestorDePaginas.html
         String rutaArchivo;
         rutaArchivo = directorioActual + "\\src\\main\\java\\HTML\\GET.html";
+        crearHTML_TablaPartidas();
         escribirIndex(rutaArchivo, contenidoHTML);
         return contenidoHTML.toString();
     }
